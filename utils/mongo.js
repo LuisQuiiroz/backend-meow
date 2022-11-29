@@ -2,14 +2,14 @@ const mongoose = require('mongoose')
 
 // mongoose.connect(process.env.MONGODB_URI)
 
-if(process.env.length < 3) {
+if (process.env.length < 3) {
   console.log('please provide the password as an argument: node mongo.js <password>')
   process.exit(1)
 }
 
 const password = process.argv[2]
 
-const url =`mongodb+srv://fullstack:${password}@cluster0.evqrs.mongodb.net/meow-app?retryWrites=true&w=majority`
+const url = `mongodb+srv://fullstack:${password}@cluster0.evqrs.mongodb.net/meow-app?retryWrites=true&w=majority`
 
 mongoose.connect(url)
 
