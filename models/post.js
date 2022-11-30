@@ -1,24 +1,12 @@
 const mongoose = require('mongoose')
 
-const url = process.env.MONGODB_URI
-
-console.log('connecting to ', url)
-
-mongoose.connect(url)
-  .then(result => {
-    console.log('connected to MongoDB')
-  })
-  .catch(error => {
-    console.log('error connecting to mongoDB:', error.message)
-  })
-
 // Esquema MongoDB
 const postSchema = new mongoose.Schema({
   content: String,
-  date: Date,
   url_img: String,
   likes: Number,
   comments: String,
+  date: Date,
   uid: String
 })
 
@@ -30,7 +18,5 @@ postSchema.set('toJSON', {
     delete returnedObject.__v
   }
 })
-
-// const Post = mongoose.model('Post', postSchema)
 
 module.exports = mongoose.model('Post', postSchema)
