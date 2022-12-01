@@ -1,8 +1,12 @@
 const config = require('./utils/config')
 const express = require('express')
+// express-async-errors elimina el try-catch
+// Si ocurre una excepción en una ruta async, la ejecución se pasa automáticamente al middleware de manejo de errores.
+require('express-async-errors')
 const app = express()
 const cors = require('cors')
 const morgan = require('morgan')
+const usersRouter = require('./controllers/users')
 const postsRouter = require('./controllers/posts')
 const { unknownEndpoint, errorHandler } = require('./utils/middleware')
 const logger = require('./utils/logger')
@@ -37,6 +41,7 @@ app.use(morgan(':method :url :status :res[content-length] - :response-time ms :b
 // })
 
 // Rutas
+app.use('/api/users', usersRouter)
 app.use('/api/posts', postsRouter)
 
 // Rutas desconocidas
