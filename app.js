@@ -8,6 +8,7 @@ const cors = require('cors')
 const morgan = require('morgan')
 const usersRouter = require('./controllers/users')
 const postsRouter = require('./controllers/posts')
+const loginRouter = require('./controllers/login')
 const { unknownEndpoint, errorHandler } = require('./utils/middleware')
 const logger = require('./utils/logger')
 const mongoose = require('mongoose')
@@ -43,6 +44,7 @@ app.use(morgan(':method :url :status :res[content-length] - :response-time ms :b
 // Rutas
 app.use('/api/users', usersRouter)
 app.use('/api/posts', postsRouter)
+app.use('/api/login', loginRouter)
 
 // Rutas desconocidas
 app.use(unknownEndpoint)

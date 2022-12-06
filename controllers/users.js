@@ -3,7 +3,7 @@ const bcrypt = require('bcrypt')
 const UsersDB = require('../models/user')
 
 // obtiene todos los usuarios
-usersRouter.get('/', async (request, response) => {
+usersRouter.get('/', async (request, response, next) => {
   const users = await UsersDB
     .find({}).populate('postsId', { content: 1, url_img: 1 })
     // populate() trae toda la informacion pertenecientes a los ids de postsId
@@ -11,7 +11,7 @@ usersRouter.get('/', async (request, response) => {
 })
 
 // crear un usuario nuevo
-usersRouter.post('/', async (request, response) => {
+usersRouter.post('/', async (request, response, next) => {
   const body = request.body
 
   const saltRounds = 10

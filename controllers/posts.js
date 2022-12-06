@@ -4,14 +4,14 @@ const UsersDB = require('../models/user')
 const logger = require('../utils/logger')
 
 // informacion del numero de posts
-postsRouter.get('/info', async (request, response) => {
+postsRouter.get('/info', async (request, response, next) => {
   const date = new Date()
   const posts = await PostsDB.find({})
   response.send(`Hay ${posts.length} posts en total <br> ${date}`)
 })
 
 // obetner todos los posts
-postsRouter.get('/', async (request, response) => {
+postsRouter.get('/', async (request, response, next) => {
   const posts = await PostsDB
     .find({}).populate('userId', { email: 1, username: 1 })
   response.json(posts)
@@ -31,6 +31,10 @@ postsRouter.get('/:uid', async (request, response, next) => {
 
 // crear un nuevo post, por el momento sin usuario
 postsRouter.post('/', async (request, response, next) => {
+  // body debe de traer al menos lo siguiente
+  // content
+  // url_img
+  // userId
   const body = request.body
 
   if ((!body.content || body.content === undefined) && (!body.url_img || body.url_img === undefined)) {
