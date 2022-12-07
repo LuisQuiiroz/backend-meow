@@ -12,6 +12,7 @@ const loginRouter = require('./controllers/login')
 const { unknownEndpoint, errorHandler } = require('./utils/middleware')
 const logger = require('./utils/logger')
 const mongoose = require('mongoose')
+const tokenExtractor = require('./utils/tokenExtractor ')
 
 logger.info('connecting...')
 
@@ -40,6 +41,8 @@ app.use(morgan(':method :url :status :res[content-length] - :response-time ms :b
 // postsRouter.get('/', (request, response) => {
 //   response.send('Hellow world')
 // })
+
+app.use(tokenExtractor)
 
 // Rutas
 app.use('/api/users', usersRouter)

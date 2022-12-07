@@ -1,18 +1,24 @@
 const logger = require('./logger')
 
-const unknownEndpoint = (request, response) => {
-  response.status(404).send({ error: 'unknown endpoint' })
+const unknownEndpoint = (request, response, next) => {
+  response.status(404).json({ error: 'Ruta desconocida' })
+}
+
+const typeOfError = {
+  CastError: { http: 400, msg: 'id con formato incorrecto' },
+  ValidationError: { http: 400 },
+  JsonWebTokenError: { http: 400, msg: 'token invalido' },
+  TokenExpiredError: { http: 401, msg: 'Vuelve a iniciar sesión' }
 }
 
 const errorHandler = (error, request, response, next) => {
   logger.error(error.message)
 
-  if (error.name === 'CastError') {
-    return response.status(400).send({ error: 'malformatted id' })
-  } else if (error.name === 'ValidationError') {
-    return response.status(400).json({ error: error.message })
+  if (typeOfError[error.name]) {
+    return response
+      .status(typeOfError[error.name].http)
+      .json({ error: typeOfError[error.name].msg || error.message })
   }
-
   next(error)
 }
 
