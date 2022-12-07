@@ -7,7 +7,7 @@ const unknownEndpoint = (request, response, next) => {
 const typeOfError = {
   CastError: { http: 400, msg: 'id con formato incorrecto' },
   ValidationError: { http: 400 },
-  JsonWebTokenError: { http: 400, msg: 'token invalido' },
+  JsonWebTokenError: { http: 400, msg: 'falta token o es invalido' },
   TokenExpiredError: { http: 401, msg: 'Vuelve a iniciar sesión' }
 }
 

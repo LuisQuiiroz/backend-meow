@@ -1,6 +1,7 @@
 const usersRouter = require('express').Router()
 const bcrypt = require('bcrypt')
 const UsersDB = require('../models/user')
+const logger = require('../utils/logger')
 
 // obtiene todos los usuarios
 usersRouter.get('/', async (request, response, next) => {
@@ -8,6 +9,18 @@ usersRouter.get('/', async (request, response, next) => {
     .find({}).populate('postsId', { content: 1, url_img: 1 })
     // populate() trae toda la informacion pertenecientes a los ids de postsId
   response.json(users)
+})
+
+// Obtiene un usuario
+usersRouter.get('/:uid', async (request, response, next) => {
+  const uid = request.params.uid
+  const user = await UsersDB.findById(uid)
+  if (user) {
+    response.json(user)
+  } else {
+    logger.error('Sorry, that users does not exist')
+    response.status(400).json({ error: 'No existe ese usuario' })
+  }
 })
 
 // crear un usuario nuevo

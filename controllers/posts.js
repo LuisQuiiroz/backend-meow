@@ -12,17 +12,17 @@ postsRouter.get('/info', async (request, response, next) => {
   response.send(`Hay ${posts.length} posts en total <br> ${date}`)
 })
 
-// obetner todos los posts
+// Obtener todos los posts
 postsRouter.get('/', async (request, response, next) => {
   const posts = await PostsDB
     .find({}).populate('userId', { email: 1, username: 1 })
   response.json(posts)
 })
 
-// obtener un post mediante su uid
-postsRouter.get('/:uid', async (request, response, next) => {
-  const uid = request.params.uid
-  const post = await PostsDB.findById(uid)
+// obtener un post mediante su pid
+postsRouter.get('/:pid', async (request, response, next) => {
+  const pid = request.params.pid
+  const post = await PostsDB.findById(pid)
   if (post) {
     response.json(post)
   } else {
@@ -46,6 +46,8 @@ postsRouter.post('/', async (request, response, next) => {
     return response.status(401).json({ error: 'falta el token o no es válido' })
   }
 
+  const user = await UsersDB.findById(decodedToken.uid)
+
   // Valida que la publicacion no venga vacia
   if ((!body.content || body.content === undefined) && (!body.url_img || body.url_img === undefined)) {
     logger.error('Content missing')
@@ -53,8 +55,6 @@ postsRouter.post('/', async (request, response, next) => {
       error: 'falta contenido'
     })
   }
-
-  const user = await UsersDB.findById(decodedToken.uid)
 
   // Nuevo post
   const post = new PostsDB({
@@ -76,22 +76,25 @@ postsRouter.post('/', async (request, response, next) => {
 
 // eliminar un post mediante su uid
 postsRouter.delete('/:uid', async (request, response, next) => {
-  const uid = request.params.uid
   const decodedToken = jwt.verify(request.token, config.SECRET)
   // valida que haya token
   if (!request.token || !decodedToken.uid) {
     return response.status(401).json({ error: 'falta el token o no es válido' })
   }
+  const uid = request.params.uid
 
   const postToDelete = await PostsDB.findById(uid)
   const userOfPost = await UsersDB.findById(decodedToken.uid)
 
+  // valida no existe el post o si el post a eliminar coincide con la persona dueña del post
   if ((postToDelete === null) || (postToDelete.userId.toString() !== userOfPost._id.toString())) {
     return response.status(401).json({ error: 'No existe el post' })
   }
-  console.log(uid)
-  console.log(postToDelete._id)
+
+  // Elimina el post de todos los posts
   await PostsDB.findByIdAndRemove(postToDelete._id)
+  // Elimina el post del usuario que lo creó
+  await UsersDB.findOneAndRemove(postToDelete._id)
 
   response.status(204).end()
   logger.info('Post deleted')
@@ -99,9 +102,22 @@ postsRouter.delete('/:uid', async (request, response, next) => {
 
 // actualizar el contenido o la imagen de un post por medio de su uid
 postsRouter.put('/:uid', async (request, response, next) => {
+  const decodedToken = jwt.verify(request.token, config.SECRET)
+  // valida que haya token
+  if (!request.token || !decodedToken.uid) {
+    return response.status(401).json({ error: 'falta el token o no es válido' })
+  }
   const uid = request.params.uid
   const body = request.body
 
+  const postToUpdateFromDb = await PostsDB.findById(uid)
+  const userOfPost = await UsersDB.findById(decodedToken.uid)
+
+  if (postToUpdateFromDb === null) {
+    return response.status(401).json({ error: 'No se econtró el post' })
+  } else if (postToUpdateFromDb.userId.toString() !== userOfPost._id.toString()) {
+    return response.status(401).json({ error: 'No puedes modificar este post' })
+  }
   const postToUpdate = {
     content: body.content,
     url_img: body.url_img

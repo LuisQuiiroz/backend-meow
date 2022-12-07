@@ -42,6 +42,7 @@ app.use(morgan(':method :url :status :res[content-length] - :response-time ms :b
 //   response.send('Hellow world')
 // })
 
+// Pone el token en request(request.token), si es que se proporciona en la solicitud
 app.use(tokenExtractor)
 
 // Rutas
